@@ -1,0 +1,10 @@
+@baseUrl=http://192.168.1.20:8002
+
+GET {{baseUrl}}
+
+### Get rooms
+GET {{baseUrl}}/rooms
+
+### Get one room
+GET {{baseUrl}}/rooms/10
+
