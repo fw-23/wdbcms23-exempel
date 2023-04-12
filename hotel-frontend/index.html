@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel frontend</title>
+</head>
+<body>
+    Rooms:
+    <ul></ul>
+    
+    <script>
+        async function getRooms() {
+            const resp = await fetch("http://128.214.253.222:8002/rooms");
+            const respJson = await resp.json();
+
+            console.log(respJson);
+            for (room of respJson.rooms) {
+                document.querySelector('ul').innerHTML += `
+                    <li>${room.number}: ${room.type}</li>
+                `;
+            }
+        }
+        getRooms();
+    </script>
+</body>
+</html>

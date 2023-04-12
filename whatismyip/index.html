@@ -14,10 +14,12 @@
                                     // flask-serverns IP med din egen port!
             const resp = await fetch('http://128.214.253.222:8000');
             //console.log(resp);
-            const ip = await resp.text(); 
-            //console.log(ip);
+            const ip = await resp.json(); 
+            console.log(ip);
 
-            document.querySelector('h1').innerText = `My IP is ${ip}`;
+            document.querySelector('h1').innerHTML = `
+                My IP is ${ip.ip} and today's message is ${ip.msg}
+            `;
         }
         getIP();
 
