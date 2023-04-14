@@ -13,14 +13,6 @@ CORS(app) # Tillåt cross-origin requests
 db_url = os.environ.get('DB_URL') # ta variabeln från .env
 conn = psycopg.connect(db_url, row_factory=dict_row) # dict_row: få query-resultat som list of dicts
 
-# Ersätts senare med databas
-rooms_list = [
-    { "number": 101, "type": "single", "price": 80},
-    { "number": 202, "type": "double", "price": 150},
-    { "number": 303, "type": "single", "price": 80},
-    { "number": 404, "type": "suite", "price": 500}
-]
-
 @app.route("/")
 def index():
     return "Use endpoints /rooms or /bookings"
@@ -34,6 +26,9 @@ def guests():
 
 @app.route("/rooms")
 def rooms():
+    with conn.cursor() as cur:
+        cur.execute("SELECT * FROM hotel_room ORDER BY room_number")
+        rooms_list = cur.fetchall()
     return { 
         "rooms": rooms_list, 
         "room_count": len(rooms_list) 
