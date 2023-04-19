@@ -18,7 +18,7 @@
             console.log(respJson);
             for (room of respJson.rooms) {
                 document.querySelector('ul').innerHTML += `
-                    <li>${room.number}: ${room.type}</li>
+                    <li>${room.room_number}: ${room.size}</li>
                 `;
             }
         }
