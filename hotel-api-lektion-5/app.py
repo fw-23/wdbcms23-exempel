@@ -18,6 +18,21 @@ conn = psycopg.connect(db_url, row_factory=dict_row, autocommit=True) # autocomm
 def index():
     return "Use endpoints /rooms or /bookings"
 
+
+@app.route("/guests/<int:id>")
+def guest(id):
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT * 
+                FROM hotel_guest
+                WHERE id = %s""", [ id ])
+            result = cur.fetchone()
+        return result
+    except:
+        # vi kan skriva statuskoden direkt efter response bodyn
+        return {"message": "ERROR: no such guest"}, 400
+
 @app.route("/guests")
 def guests():
     with conn.cursor() as cur:
@@ -34,19 +49,16 @@ def rooms():
         "rooms": rooms_list, 
         "room_count": len(rooms_list) 
     }
-    #return jsonify(rooms_list)
-
-@app.route("/rooms/<int:id>")
-def room(id):
-    try:
-        return rooms_list[id]
-    except:
-        # vi kan skriva statuskoden direkt efter response bodyn
-        return {"message": "ERROR: no such room"}, 400
 
 
 @app.route("/bookings", methods=['GET', 'POST'])
 def bookings():
+    if request.method == 'GET':
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM hotel_booking")
+            result = cur.fetchall()
+        return { "bookings": result }
+
     if request.method == 'POST':
         try:
             req_body = request.get_json()

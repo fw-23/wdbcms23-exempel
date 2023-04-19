@@ -5,11 +5,13 @@ GET {{baseUrl}}
 ### Get guests
 GET {{baseUrl}}/guests
 
+### Get one guest
+GET {{baseUrl}}/guests/1
+
 ### Get rooms
 GET {{baseUrl}}/rooms
 
-### Get one room
-GET {{baseUrl}}/rooms/10
+
 
 ### Bookings GET
 GET {{baseUrl}}/bookings
