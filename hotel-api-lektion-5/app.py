@@ -82,7 +82,9 @@ def bookings():
 
             return { "new_booking": new_id }
         except Exception as e:
-            return { "message": repr(e)}, 400
+            # visa inte fullständig error-info i produktion!
+            print("ERROR: " + repr(e)) # Skriv felmeddelandet i serverns konsol
+            return { "message": "ERROR: Something went wrong."}, 400
 
     else:
         return { "Du använde metoden": request.method }
