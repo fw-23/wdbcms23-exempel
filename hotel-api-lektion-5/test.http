@@ -12,7 +12,6 @@ GET {{baseUrl}}/guests/1
 GET {{baseUrl}}/rooms
 
 
-
 ### Bookings GET
 GET {{baseUrl}}/bookings
 
