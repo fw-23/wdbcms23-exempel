@@ -36,18 +36,7 @@ def guest(id):
 @app.route("/guests")
 def guests():
     with conn.cursor() as cur:
-        cur.execute("""
-            SELECT 
-                g.id,
-                g.firstname,
-                g.lastname,
-                (SELECT count(*) 
-                    FROM hotel_booking
-                    WHERE guest_id = g.id
-                    AND startdate < now()) AS previous_visits
-            FROM 
-                hotel_guest g
-        """)
+        cur.execute("SELECT * FROM hotel_guest")
         result = cur.fetchall()
     return { "guests": result }
 
@@ -68,19 +57,9 @@ def bookings():
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT 
-                    b.id,
-                    b.startdate::varchar, -- ändra datatyp date till varchar för bättre JSON
-                    b.room_id,
-                    b.info,
-                    g.firstname,
-                    g.lastname
+                    *
                 FROM 
-                    hotel_booking b
-                INNER JOIN
-                    hotel_guest g
-                    ON g.id = b.guest_id
-                ORDER BY startdate
-            """)
+                    hotel_booking""")
             result = cur.fetchall()
         return { "bookings": result }
 

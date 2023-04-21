@@ -1,0 +1,28 @@
+@baseUrl=http://192.168.1.20:8002
+
+GET {{baseUrl}}
+
+### Get guests
+GET {{baseUrl}}/guests
+
+### Get one guest
+GET {{baseUrl}}/guests/1
+
+### Get rooms
+GET {{baseUrl}}/rooms
+
+
+
+### Bookings GET
+GET {{baseUrl}}/bookings
+
+### Bookings POST
+POST {{baseUrl}}/bookings
+Content-Type: application/json
+
+{
+    "room_id": 2,
+    "guest_id": 1,
+    "startdate": "2023-05-01",
+    "info": "Rena lakan den här gången, tack!"
+}
