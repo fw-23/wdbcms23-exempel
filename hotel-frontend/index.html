@@ -8,6 +8,7 @@
 </head>
 <body>
     <h2>Boka ett rum!</h2>
+    Gäst: <select id="guest"></select><br>
     Datum: <input id="start-date" type="date"><br>
     Rum: <select id="room"></select><br>
     Tilläggsinformation:<br><textarea id="info"></textarea><br>
@@ -28,6 +29,21 @@
         }
         getRooms();
 
+        async function getGuests() {
+            const resp = await fetch("http://128.214.253.222:8002/guests");
+            const respJson = await resp.json();
+
+            console.log(respJson);
+            for (guest of respJson.guests) {
+                document.querySelector('#guest').innerHTML += `
+                    <option value="${guest.id}">
+                        ${guest.firstname} ${guest.lastname} (${guest.previous_visits} tidigare besök)
+                    </li>
+                `;
+            }
+        }
+        getGuests();
+
         async function newBooking(booking) {
 
             console.log(booking);
@@ -46,7 +62,7 @@
 
         document.querySelector('#save-booking').addEventListener('click', () => {
             const booking = {
-                guest_id: 1,
+                guest_id: Number(document.querySelector('#guest').value),
                 room_id: Number(document.querySelector('#room').value),
                 startdate: document.querySelector('#start-date').value,
                 info: document.querySelector('#info').value
