@@ -21,17 +21,24 @@ def index():
 
 @app.route("/guests/<int:id>")
 def guest(id):
+    if not request.args.get('api_key'):
+        return {"message": "ERROR: No API-key provided"}, 401
+
     try:
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT * 
                 FROM hotel_guest
-                WHERE id = %s""", [ id ])
+                WHERE id = %s
+                AND api_key = %s""", [ 
+                    id, 
+                    request.args.get('api_key') 
+                ])
             result = cur.fetchone()
-        return result
+        return result or {"message": "ERROR: no such guest"}, 400
     except:
         # vi kan skriva statuskoden direkt efter response bodyn
-        return {"message": "ERROR: no such guest"}, 400
+        return {"message": "ERROR: something went wrong"}, 400
 
 @app.route("/guests")
 def guests():
@@ -79,8 +86,9 @@ def bookings():
                 INNER JOIN
                     hotel_guest g
                     ON g.id = b.guest_id
+                WHERE g.api_key = %s
                 ORDER BY startdate
-            """)
+            """, [request.args.get('api_key')])
             result = cur.fetchall()
         return { "bookings": result }
 
