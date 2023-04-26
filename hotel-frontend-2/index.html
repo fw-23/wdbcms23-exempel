@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hotel frontend</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h3>Välkommen <span id="guest"></span>, boka ett rum!</h3>
@@ -50,6 +51,11 @@
         }
         getGuest();
 
+        async function saveStars(booking_id) {
+            const stars = document.querySelector("#stars-"+booking_id).value;
+            alert(stars + " stars!");
+        }
+
         async function getBookings() {
             const resp = await fetch(API_URL + "/bookings?api_key=" + API_KEY);
             const respJson = await resp.json();
@@ -57,7 +63,14 @@
             console.log(respJson);
             for (booking of respJson.bookings) {
                 document.querySelector('#bookings').innerHTML += `
-                    <div id="booking-${booking.id}">${booking.startdate}: ${booking.info}</div>
+                    <div id="booking-${booking.id}">
+                        ${booking.startdate}: ${booking.info}
+                        <select id="stars-${booking.id}" onchange="saveStars(${booking.id})">
+                            <option value="1">⭐</option>
+                            <option value="2">⭐⭐</option>
+                            <option value="3">⭐⭐⭐</option>
+                        </select>
+                    </div>
                 `;
             }
         }
@@ -77,6 +90,7 @@
             document.querySelector("#message").innerHTML = `
                 Bokningen lyckades, ditt bokningsnummer är: ${respJSON.new_booking}
             `;
+            getBookings();
             console.log(respJSON);
         }
 
