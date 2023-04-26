@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel frontend</title>
+</head>
+<body>
+    <h2>Boka ett rum!</h2>
+    Gäst: <select id="guest"></select><br>
+    Datum: <input id="start-date" type="date"><br>
+    Rum: <select id="room"></select><br>
+    Tilläggsinformation:<br><textarea id="info"></textarea><br>
+    <input type="button" id="save-booking" value="Boka">
+    <p id="message"></p>
+
+    <script>
+        async function getRooms() {
+            const resp = await fetch("http://128.214.253.222:8002/rooms");
+            const respJson = await resp.json();
+
+            console.log(respJson);
+            for (room of respJson.rooms) {
+                document.querySelector('#room').innerHTML += `
+                    <option value="${room.id}">${room.room_number}: ${room.size}</li>
+                `;
+            }
+        }
+        getRooms();
+
+        async function getGuests() {
+            const resp = await fetch("http://128.214.253.222:8002/guests");
+            const respJson = await resp.json();
+
+            console.log(respJson);
+            for (guest of respJson.guests) {
+                document.querySelector('#guest').innerHTML += `
+                    <option value="${guest.id}">
+                        ${guest.firstname} ${guest.lastname} (${guest.previous_visits} tidigare besök)
+                    </li>
+                `;
+            }
+        }
+        getGuests();
+
+        async function newBooking(booking) {
+
+            console.log(booking);
+            const resp = await fetch("http://128.214.253.222:8002/bookings", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(booking)
+            });
+
+            const respJSON = await resp.json();
+            document.querySelector("#message").innerHTML = `
+                Bokningen lyckades, ditt bokningsnummer är: ${respJSON.new_booking}
+            `;
+            console.log(respJSON);
+        }
+
+        document.querySelector('#save-booking').addEventListener('click', () => {
+            const booking = {
+                guest_id: Number(document.querySelector('#guest').value),
+                room_id: Number(document.querySelector('#room').value),
+                startdate: document.querySelector('#start-date').value,
+                info: document.querySelector('#info').value
+            }
+
+            newBooking(booking);
+
+        });
+
+    </script>
+</body>
+</html>
