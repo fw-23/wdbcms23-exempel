@@ -7,17 +7,24 @@
     <title>Hotel frontend</title>
 </head>
 <body>
-    <h2>Boka ett rum!</h2>
-    Gäst: <span id="guest"></span><br>
+    <h3>Välkommen <span id="guest"></span>, boka ett rum!</h3>
     Datum: <input id="start-date" type="date"><br>
     Rum: <select id="room"></select><br>
     Tilläggsinformation:<br><textarea id="info"></textarea><br>
     <input type="button" id="save-booking" value="Boka">
     <p id="message"></p>
+    <hr>
+    <h4>Bokningar</h4>
+    <div id="bookings"></div>
 
     <script>
         const GUEST_LOGGED_IN = 1; // Har loggat in på sidan
         const API_URL = "http://128.214.253.222:8002";
+        
+        if (!localStorage.getItem('hotel_api_key')) {
+            localStorage.setItem('hotel_api_key', prompt("Fyll i din API-key!"));
+        }
+        const API_KEY = localStorage.getItem('hotel_api_key');
 
         async function getRooms() {
             const resp = await fetch(API_URL + "/rooms");
@@ -33,7 +40,8 @@
         getRooms();
 
         async function getGuest() {
-            const resp = await fetch(API_URL + "/guests/" + GUEST_LOGGED_IN);
+            const resp = await fetch(API_URL + "/guests/" + GUEST_LOGGED_IN + "?api_key=" + API_KEY);
+            //          http://128.214.253.222:8002/guests/1?api_key=b6c090f9196687f9ff55c9208f2b1042
             const respJson = await resp.json();
 
             console.log(respJson);
@@ -41,6 +49,20 @@
 
         }
         getGuest();
+
+        async function getBookings() {
+            const resp = await fetch(API_URL + "/bookings?api_key=" + API_KEY);
+            const respJson = await resp.json();
+
+            console.log(respJson);
+            for (booking of respJson.bookings) {
+                document.querySelector('#bookings').innerHTML += `
+                    <div id="booking-${booking.id}">${booking.startdate}: ${booking.info}</div>
+                `;
+            }
+        }
+        getBookings();
+        
 
         async function newBooking(booking) {
 
@@ -58,9 +80,12 @@
             console.log(respJSON);
         }
 
+
+
+
         document.querySelector('#save-booking').addEventListener('click', () => {
             const booking = {
-                guest_id: Number(document.querySelector('#guest').value),
+                guest_id: GUEST_LOGGED_IN,
                 room_id: Number(document.querySelector('#room').value),
                 startdate: document.querySelector('#start-date').value,
                 info: document.querySelector('#info').value
