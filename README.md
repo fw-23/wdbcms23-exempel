@@ -1,3 +1,3 @@
 # wdbcms23-exempel
 
-Hej det här är repon för lektionsexempel!
+Lektionsexempel för Webbkommunikation DB och CMS
