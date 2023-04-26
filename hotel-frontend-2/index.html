@@ -8,7 +8,7 @@
 </head>
 <body>
     <h2>Boka ett rum!</h2>
-    Gäst: <select id="guest"></select><br>
+    Gäst: <span id="guest"></span><br>
     Datum: <input id="start-date" type="date"><br>
     Rum: <select id="room"></select><br>
     Tilläggsinformation:<br><textarea id="info"></textarea><br>
@@ -16,8 +16,11 @@
     <p id="message"></p>
 
     <script>
+        const GUEST_LOGGED_IN = 1; // Har loggat in på sidan
+        const API_URL = "http://128.214.253.222:8002";
+
         async function getRooms() {
-            const resp = await fetch("http://128.214.253.222:8002/rooms");
+            const resp = await fetch(API_URL + "/rooms");
             const respJson = await resp.json();
 
             console.log(respJson);
@@ -29,25 +32,20 @@
         }
         getRooms();
 
-        async function getGuests() {
-            const resp = await fetch("http://128.214.253.222:8002/guests");
+        async function getGuest() {
+            const resp = await fetch(API_URL + "/guests/" + GUEST_LOGGED_IN);
             const respJson = await resp.json();
 
             console.log(respJson);
-            for (guest of respJson.guests) {
-                document.querySelector('#guest').innerHTML += `
-                    <option value="${guest.id}">
-                        ${guest.firstname} ${guest.lastname} (${guest.previous_visits} tidigare besök)
-                    </li>
-                `;
-            }
+            document.querySelector("#guest").innerText = respJson.firstname;
+
         }
-        getGuests();
+        getGuest();
 
         async function newBooking(booking) {
 
             console.log(booking);
-            const resp = await fetch("http://128.214.253.222:8002/bookings", {
+            const resp = await fetch(API_URL + "/bookings", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(booking)
