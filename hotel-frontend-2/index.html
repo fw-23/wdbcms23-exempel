@@ -28,7 +28,7 @@
         const API_KEY = localStorage.getItem('hotel_api_key');
 
         async function getRooms() {
-            const resp = await fetch(API_URL + "/rooms");
+            const resp = await fetch(API_URL + "/rooms?api_key=" + API_KEY);
             const respJson = await resp.json();
 
             console.log(respJson);
@@ -80,7 +80,7 @@
         async function newBooking(booking) {
 
             console.log(booking);
-            const resp = await fetch(API_URL + "/bookings", {
+            const resp = await fetch(API_URL + "/bookings?api_key=" + API_KEY, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(booking)
