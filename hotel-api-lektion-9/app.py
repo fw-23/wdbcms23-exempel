@@ -14,26 +14,28 @@ CORS(app) # Tillåt cross-origin requests
 db_url = os.environ.get('DB_URL') # ta variabeln från .env
 conn = psycopg.connect(db_url, row_factory=dict_row, autocommit=True) # autocommit: commita databas-transaction automatiskt
 
+def check_key(api_key): 
+    with conn.cursor() as cur:
+        cur.execute("SELECT id FROM hotel_guest WHERE api_key = %s", [api_key])
+        return cur.fetchone()['id']
+
 @app.route("/")
 def index():
     return "Use endpoints /rooms or /bookings"
 
-
 @app.route("/guests/<int:id>")
 def guest(id):
-    if not request.args.get('api_key'):
-        return {"message": "ERROR: No API-key provided"}, 401
+    try:
+        guest_id = check_key(request.args.get('api_key'))
+    except:
+        return {"message": "ERROR: Invalid API-key"}, 401
 
     try:
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT * 
                 FROM hotel_guest
-                WHERE id = %s
-                AND api_key = %s""", [ 
-                    id, 
-                    request.args.get('api_key') 
-                ])
+                WHERE id = %s""", [ guest_id ])
             result = cur.fetchone()
         return result or {"message": "ERROR: no such guest"}, 400
     except:
@@ -42,6 +44,11 @@ def guest(id):
 
 @app.route("/guests")
 def guests():
+    try:
+        guest_id = check_key(request.args.get('api_key'))
+    except:
+        return {"message": "ERROR: Invalid API-key"}, 401
+
     with conn.cursor() as cur:
         cur.execute("""
             SELECT 
@@ -71,6 +78,11 @@ def rooms():
 
 @app.route("/bookings", methods=['GET', 'POST'])
 def bookings():
+    try:
+        guest_id = check_key(request.args.get('api_key'))
+    except:
+        return {"message": "ERROR: Invalid API-key"}, 401
+
     if request.method == 'GET':
         with conn.cursor() as cur:
             cur.execute("""
@@ -86,9 +98,9 @@ def bookings():
                 INNER JOIN
                     hotel_guest g
                     ON g.id = b.guest_id
-                WHERE g.api_key = %s
+                WHERE g.id = %s
                 ORDER BY startdate DESC
-            """, [request.args.get('api_key')])
+            """, [guest_id])
             result = cur.fetchall()
         return { "bookings": result }
 
@@ -107,7 +119,7 @@ def bookings():
                     ) RETURNING id
                 """, [
                     req_body['room_id'],
-                    req_body['guest_id'],
+                    guest_id,
                     req_body['startdate'],
                     escape(req_body['info'])
                 ])
