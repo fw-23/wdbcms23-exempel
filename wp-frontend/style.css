@@ -1,0 +1,11 @@
+body {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+#blog-posts > div {
+    border: 1px solid silver;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 500px;
+}

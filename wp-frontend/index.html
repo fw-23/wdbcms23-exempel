@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Headless CMS-demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Min blogg</h1>
+    <div id="blog-posts"></div>
+    
+    <script>
+        (async () => {
+            const resp = await fetch('http://localhost:10017/wp-json/wp/v2/posts');
+            const blogPosts = await resp.json();
+            console.log(blogPosts);
+
+            for (post of blogPosts) {
+                document.querySelector('#blog-posts').innerHTML += `
+                    <div>
+                        <h2>${post.title.rendered}</h2>
+                        <p>${post.content.rendered}</p>
+                        <small>
+                            Publicerat ${post.date.split('T')[0]}, 
+                            Läs mer på vår <a href="${post.link}">WordPress-sida</a>
+                        </small>
+                    </div>
+                `;
+            }
+
+        })();
+    
+    </script>
+</body>
+</html>
